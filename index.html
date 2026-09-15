@@ -1,0 +1,1362 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ruleta ESI · Ciudadanía digital</title>
+<style>
+:root{
+  --chalk:#0f5960;
+  --chalk2:#0b464c;
+  --ink:#17304d;
+  --white:#fff;
+  --red:#ff334d;
+  --green:#24cf68;
+  --pink:#ff4fbd;
+  --blue:#1f9df0;
+  --orange:#ff941f;
+  --purple:#8d49e8;
+  --yellow:#ffd84d;
+  --cyan:#55d8ff;
+  --deep:#10294d;
+  --panel:#112c50;
+  --gold:#ead08e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  min-height:100vh;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:white;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(84,216,255,.16),transparent 24%),
+    radial-gradient(circle at 92% 4%,rgba(255,79,189,.14),transparent 22%),
+    linear-gradient(160deg,#29b5eb,#7f40d8 48%,#fa42ad);
+}
+button{font:inherit}
+.app{
+  max-width:1400px;
+  margin:auto;
+  padding:18px;
+}
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:34px;
+  padding:20px 20px 14px;
+  background:
+    linear-gradient(rgba(255,255,255,.025),rgba(255,255,255,.025)),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 4px),
+    radial-gradient(circle at 30% 20%,rgba(255,255,255,.045),transparent 28%),
+    linear-gradient(160deg,var(--chalk),var(--chalk2));
+  box-shadow:0 24px 70px rgba(9,20,52,.28);
+  border:1px solid rgba(255,255,255,.13);
+}
+.paint{
+  position:absolute;
+  border-radius:18px;
+  opacity:.9;
+  filter:saturate(1.15);
+  transform:rotate(-4deg);
+  pointer-events:none;
+}
+.paint.a{left:-55px;top:-28px;width:360px;height:90px;background:#ac36dc}
+.paint.b{left:120px;top:55px;width:270px;height:68px;background:#16b8ec;transform:rotate(-7deg)}
+.paint.c{right:-80px;bottom:-32px;width:430px;height:105px;background:#ff45b1;transform:rotate(5deg)}
+.paint.d{left:-40px;bottom:10px;width:300px;height:88px;background:#6a42e0;transform:rotate(6deg)}
+.top{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:12px;
+}
+.esiLogo{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:flex-start;
+  line-height:.88;
+  font-weight:1000;
+  letter-spacing:-.04em;
+  font-size:clamp(34px,5vw,68px);
+  transform:rotate(-2deg);
+  text-shadow:0 4px 0 rgba(0,0,0,.10);
+}
+.esiLogo span{padding:4px 15px 7px;border-radius:2px}
+.esiLogo .r{background:#ff263c}
+.esiLogo .g{background:#63c144;margin-left:22px}
+.esiLogo .p{background:#9f54a7;margin-left:6px}
+.titleBlock{
+  text-align:center;
+  max-width:560px;
+  margin:0 auto;
+}
+.titleTape{
+  display:inline-block;
+  color:#152d4f;
+  background:#ffe35b;
+  padding:10px 20px;
+  font-weight:1000;
+  font-size:clamp(24px,3.5vw,46px);
+  line-height:1;
+  border-radius:4px;
+  transform:rotate(-2deg);
+  box-shadow:0 5px 0 rgba(0,0,0,.08);
+}
+.subtitleTape{
+  display:inline-block;
+  margin-top:7px;
+  color:#214064;
+  background:#bfeeff;
+  padding:8px 16px;
+  font-weight:900;
+  border-radius:3px;
+  transform:rotate(-1deg);
+}
+.sideWords{
+  display:flex;flex-direction:column;gap:5px;align-items:flex-end
+}
+.sideWords span{
+  padding:8px 12px;border-radius:2px;font-size:12px;font-weight:1000;
+  box-shadow:0 4px 0 rgba(0,0,0,.08)
+}
+.sideWords span:nth-child(1){background:#43bf4d}
+.sideWords span:nth-child(2){background:#9147de}
+.sideWords span:nth-child(3){background:#ff7647}
+.sideWords span:nth-child(4){background:#27c4cb}
+.sideWords span:nth-child(5){background:#2fa4ef}
+.sideWords span:nth-child(6){background:#ff4ca7}
+
+.game{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:.92fr 1.08fr;
+  gap:18px;
+}
+.wheelSide,.playSide{
+  min-width:0;
+}
+.chalkNote{
+  font-family:"Comic Sans MS","Segoe Print",cursive;
+  color:#efffff;
+  opacity:.95;
+  font-size:18px;
+  transform:rotate(-2deg);
+}
+.wheelWrap{
+  position:relative;
+  width:min(78vw,590px);
+  aspect-ratio:1;
+  margin:10px auto 8px;
+}
+canvas{
+  width:100%;height:100%;
+  filter:drop-shadow(0 18px 25px rgba(0,0,0,.27));
+}
+.pointer{
+  position:absolute;
+  left:50%;top:1px;transform:translateX(-50%);
+  width:0;height:0;
+  border-left:22px solid transparent;
+  border-right:22px solid transparent;
+  border-top:42px solid #f5f7fb;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.25));
+  z-index:5;
+}
+.hubButton{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:145px;height:145px;border-radius:50%;
+  border:10px solid #f0f3f7;
+  background:linear-gradient(180deg,#ffec55,#ffd634);
+  color:#15345b;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:4;
+  cursor:pointer;
+  box-shadow:
+    0 10px 0 #d7aa18,
+    0 18px 30px rgba(0,0,0,.24),
+    0 0 0 6px rgba(255,255,255,.35);
+  transition:.16s transform,.16s box-shadow,.16s filter;
+}
+.hubButton:hover{
+  filter:brightness(1.04);
+  transform:translate(-50%,-50%) scale(1.03)
+}
+.hubButton:active{
+  transform:translate(-50%,-50%) translateY(5px);
+  box-shadow:0 5px 0 #d7aa18,0 12px 22px rgba(0,0,0,.22)
+}
+.hubButton strong{font-size:36px;line-height:.9;font-weight:1000}
+.hubButton small{font-weight:1000;font-size:16px}
+.hubButton.spinning{animation:pulse .75s infinite alternate}
+@keyframes pulse{
+  from{box-shadow:0 10px 0 #d7aa18,0 18px 30px rgba(0,0,0,.24),0 0 0 6px rgba(255,255,255,.35)}
+  to{box-shadow:0 10px 0 #d7aa18,0 18px 30px rgba(0,0,0,.24),0 0 34px rgba(255,237,89,.85)}
+}
+.chalkBanner{
+  width:max-content;
+  max-width:95%;
+  margin:8px auto 0;
+  background:white;
+  color:#173253;
+  padding:10px 20px;
+  font-family:"Comic Sans MS","Segoe Print",cursive;
+  font-size:clamp(17px,2.3vw,27px);
+  font-weight:1000;
+  transform:rotate(-2deg);
+  box-shadow:0 5px 0 rgba(0,0,0,.08)
+}
+.miniControls{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:13px;
+}
+.softBtn{
+  border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  font-weight:1000;
+  padding:10px 14px;
+  border-radius:15px;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  box-shadow:0 7px 16px rgba(0,0,0,.12)
+}
+.softBtn:hover{background:rgba(255,255,255,.2)}
+
+.modePanel{
+  background:rgba(15,39,77,.92);
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:22px;
+  padding:15px;
+  box-shadow:0 14px 28px rgba(0,0,0,.18);
+}
+.modePanel h3{
+  margin:0 0 11px;
+  font-size:25px;
+}
+.modeButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+.modeBtn{
+  border:2px solid rgba(255,255,255,.55);
+  color:white;
+  background:linear-gradient(180deg,#233f70,#172f58);
+  border-radius:18px;
+  padding:14px;
+  cursor:pointer;
+  font-weight:1000;
+  font-size:16px;
+  box-shadow:0 7px 0 rgba(0,0,0,.18),0 0 0 rgba(0,0,0,0);
+  transition:.16s
+}
+.modeBtn.active{
+  background:linear-gradient(180deg,#25d65d,#10ad42);
+  border-color:#dfff55;
+  box-shadow:0 7px 0 #087c2f,0 0 24px rgba(78,255,98,.55)
+}
+.modeBtn small{display:block;font-weight:700;margin-top:3px}
+
+.cardPanel{
+  margin-top:15px;
+  background:rgba(14,37,75,.95);
+  border:1px solid rgba(255,255,255,.17);
+  border-radius:24px;
+  padding:17px;
+  box-shadow:0 15px 30px rgba(0,0,0,.20)
+}
+.cardPanel h2{
+  margin:0;
+  color:white;
+  font-size:32px;
+  text-align:center
+}
+.cardPanel h2 span{
+  display:inline-block;
+  padding:5px 14px;
+  background:#9c35ed;
+  border-radius:4px;
+  transform:rotate(-1deg)
+}
+.cardLead{
+  text-align:center;
+  color:#edf7ff;
+  margin:7px 0 15px
+}
+.deckGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  perspective:1100px
+}
+.cardPick{
+  position:relative;
+  aspect-ratio:2.5/3.6;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  transition:.65s transform cubic-bezier(.2,.8,.2,1);
+  border-radius:15px
+}
+.cardPick:hover{transform:translateY(-4px) rotate(-1deg)}
+.cardPick.flipped{transform:rotateY(180deg)}
+.cardFace{
+  position:absolute;
+  inset:0;
+  backface-visibility:hidden;
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:0 10px 20px rgba(0,0,0,.24)
+}
+.cardBack{
+  border:4px solid #f2d48c;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,239,196,.14) 0 8%,transparent 9%),
+    repeating-conic-gradient(from 45deg,#6b4528 0 8deg,#7e5230 8deg 16deg,#4c301c 16deg 24deg),
+    linear-gradient(145deg,#694329,#3e2819)
+}
+.cardBack:before{
+  content:"";
+  position:absolute;inset:8px;
+  border:2px solid #e9ca7a;border-radius:10px
+}
+.cardBack:after{
+  content:"ESI";
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%) rotate(-8deg);
+  width:62px;height:62px;border-radius:50%;
+  display:grid;place-items:center;
+  color:#ffefbd;
+  font:1000 22px Georgia,serif;
+  border:3px double #e8c779;
+  background:radial-gradient(circle,#75492c,#4b2d1b)
+}
+.cardFront{
+  transform:rotateY(180deg);
+  background:linear-gradient(#fff,#f6fbff);
+  color:#203654;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between
+}
+.frontBadge{
+  align-self:flex-start;
+  padding:5px 7px;
+  border-radius:999px;
+  color:#fff;
+  font-size:9px;font-weight:1000
+}
+.frontText{
+  margin:8px 0;
+  font-size:12px;
+  line-height:1.28;
+  font-weight:900
+}
+.frontHint{font-size:9px;color:#738299;font-weight:800}
+
+.hidden{display:none!important}
+.bigCard{
+  background:linear-gradient(180deg,#fff,#f5faff);
+  color:#213653;
+  border-radius:22px;
+  padding:21px;
+  box-shadow:0 14px 30px rgba(0,0,0,.22)
+}
+.bigBadge{
+  display:inline-flex;
+  padding:7px 11px;
+  border-radius:999px;
+  color:white;
+  font-size:11px;
+  font-weight:1000
+}
+.bigQuestion{
+  font-size:clamp(23px,3vw,34px);
+  font-weight:1000;
+  line-height:1.22;
+  letter-spacing:-.03em;
+  margin:13px 0 9px
+}
+.bigSub{color:#65758c;line-height:1.5}
+.actionRow{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-top:15px
+}
+.actionBtn{
+  border:0;border-radius:15px;padding:11px 14px;
+  color:white;font-weight:1000;cursor:pointer;
+  transition:.15s transform,.15s filter
+}
+.actionBtn:active{transform:translateY(3px)}
+.reveal{background:linear-gradient(#38db78,#20b85e);box-shadow:0 5px 0 #148342}
+.suggest{background:linear-gradient(#56ddff,#2b9df3);box-shadow:0 5px 0 #1e72bd}
+.debate{background:linear-gradient(#be70ff,#904ee8);box-shadow:0 5px 0 #6632b2}
+.back{background:linear-gradient(#ffe469,#ffc938);color:#584514;box-shadow:0 5px 0 #d39d17}
+.answerBox{
+  display:none;
+  margin-top:14px;
+  padding:16px;
+  border-radius:17px;
+  line-height:1.5;
+  border:1px solid #d8e1ef
+}
+.answerBox.show{display:block;animation:show .24s ease}
+@keyframes show{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.answerBox.mito{background:#fff0f2;border-color:#f1bbc1;color:#5d2630}
+.answerBox.verdad{background:#edf9f0;border-color:#b5dfc0;color:#234b30}
+.answerBox.guide{background:#f5f0ff;border-color:#d6c5f3;color:#3c2f64}
+.answerBox.suggested{background:#eef7ff;border-color:#bdd8f2;color:#1f466f}
+.answerBox h3{margin:0 0 6px;font-size:24px}
+
+.stats{
+  display:flex;align-items:center;gap:10px;
+  margin-top:12px;
+  font-size:12px;color:#dff8ff
+}
+.progress{
+  height:8px;flex:1;border-radius:999px;
+  background:rgba(255,255,255,.18);overflow:hidden
+}
+.progress span{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,#4ed9ff,#ffe453,#ff6f7e);
+  transition:.3s
+}
+.footerStrip{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+  align-items:center;
+  margin-top:16px
+}
+.infoCard{
+  background:rgba(21,39,78,.88);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:14px 18px;
+  box-shadow:0 11px 23px rgba(0,0,0,.17)
+}
+.infoCard strong{font-size:18px}
+.infoCard small{display:block;margin-top:3px;color:#e6f7ff}
+.allBtn{
+  border:2px solid white;
+  background:linear-gradient(180deg,#493370,#2e2450);
+  color:white;
+  border-radius:18px;
+  padding:13px 17px;
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow:0 7px 0 rgba(0,0,0,.26),0 0 18px rgba(255,255,255,.12)
+}
+.modal{
+  position:fixed;inset:0;
+  display:none;
+  place-items:center;
+  padding:18px;
+  background:rgba(7,18,42,.72);
+  backdrop-filter:blur(9px);
+  z-index:99
+}
+.modal.show{display:grid}
+.modalBox{
+  width:min(100%,1050px);
+  max-height:90vh;
+  overflow:auto;
+  background:#fff;
+  color:#213653;
+  border-radius:26px;
+  padding:20px;
+  box-shadow:0 28px 70px rgba(0,0,0,.35)
+}
+.modalTop{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  position:sticky;top:0;background:#fff;padding-bottom:10px;z-index:2
+}
+.modalTop h2{margin:0}
+.closeBtn{
+  border:0;background:#edf2f8;color:#213653;
+  width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:20px;font-weight:1000
+}
+.allCards{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px
+}
+.allCard{
+  border:1px solid #dfe5ef;border-radius:16px;padding:13px;background:#f9fbff
+}
+.allCard b{
+  display:inline-block;color:#fff;padding:4px 7px;border-radius:999px;font-size:10px;margin-bottom:7px
+}
+.allCard p{margin:0;font-weight:800;line-height:1.35;font-size:13px}
+
+
+/* ===== CRONÓMETRO DE 2 MINUTOS ===== */
+.timerZone{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin:0 0 13px;
+  min-height:58px;
+}
+.timerClock{
+  --timer-color:#61e7ff;
+  display:none;
+  align-items:center;
+  gap:10px;
+  padding:8px 15px 8px 10px;
+  border-radius:999px;
+  color:white;
+  background:linear-gradient(180deg,rgba(18,51,91,.97),rgba(11,35,67,.97));
+  border:2px solid color-mix(in srgb,var(--timer-color) 68%,white 10%);
+  box-shadow:
+    0 6px 0 rgba(0,0,0,.18),
+    0 0 18px color-mix(in srgb,var(--timer-color) 38%,transparent);
+  font-weight:1000;
+  transition:.2s border-color,.2s box-shadow,.2s background;
+}
+.timerClock.show{display:flex}
+.timerIcon{
+  width:40px;height:40px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--timer-color);
+  color:#102b4d;
+  font-size:21px;
+  box-shadow:0 0 0 4px rgba(255,255,255,.10),0 0 16px var(--timer-color);
+}
+.timerDigits{
+  min-width:70px;
+  font-variant-numeric:tabular-nums;
+  font-size:27px;
+  letter-spacing:.02em;
+  line-height:1;
+}
+.timerText{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:1px;
+}
+.timerText small{
+  font-size:9px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:#dcecff;
+  opacity:.84;
+}
+.timerClock.running{
+  animation:timerHeartbeat 1s ease-in-out infinite;
+}
+.timerClock.warning{
+  --timer-color:#ffb23e;
+  animation-duration:.65s;
+}
+.timerClock.danger{
+  --timer-color:#ff354f;
+  animation-duration:.38s;
+}
+.timerClock.critical{
+  --timer-color:#ff1838;
+  animation-duration:.20s;
+}
+.timerClock.finished{
+  --timer-color:#ff1635;
+  background:linear-gradient(180deg,#811e30,#4d1020);
+  animation:timerFinished .34s ease-in-out infinite alternate;
+}
+@keyframes timerHeartbeat{
+  0%,100%{transform:scale(1)}
+  15%{transform:scale(1.055)}
+  28%{transform:scale(1)}
+  39%{transform:scale(1.025)}
+  52%{transform:scale(1)}
+}
+@keyframes timerFinished{
+  from{transform:scale(1);box-shadow:0 6px 0 rgba(0,0,0,.18),0 0 15px rgba(255,22,53,.45)}
+  to{transform:scale(1.06);box-shadow:0 6px 0 rgba(0,0,0,.18),0 0 32px rgba(255,22,53,.88)}
+}
+
+/* El borde de toda la experiencia comienza a avisar en el tramo final. */
+.hero.timer-edge-warning{
+  animation:edgePulseSlow 1.15s ease-in-out infinite;
+}
+.hero.timer-edge-danger{
+  animation:edgePulseFast .58s ease-in-out infinite;
+}
+.hero.timer-edge-critical{
+  animation:edgePulseCritical .25s ease-in-out infinite;
+}
+.hero.timer-edge-zero{
+  animation:edgePulseZero .16s ease-in-out infinite alternate;
+}
+@keyframes edgePulseSlow{
+  0%,100%{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 0 rgba(255,39,61,0)}
+  50%{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 5px rgba(255,55,72,.48),0 0 28px rgba(255,44,62,.20)}
+}
+@keyframes edgePulseFast{
+  0%,100%{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 2px rgba(255,34,55,.20)}
+  50%{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 8px rgba(255,29,51,.72),0 0 42px rgba(255,27,48,.38)}
+}
+@keyframes edgePulseCritical{
+  0%,100%{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 4px rgba(255,20,45,.35)}
+  50%{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 12px rgba(255,15,40,.92),0 0 55px rgba(255,17,43,.56)}
+}
+@keyframes edgePulseZero{
+  from{
+    box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 8px rgba(255,12,35,.66),0 0 35px rgba(255,12,35,.45);
+    filter:saturate(1);
+  }
+  to{
+    box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 15px rgba(255,8,31,1),0 0 78px rgba(255,8,31,.82);
+    filter:saturate(1.12);
+  }
+}
+
+/* ===== EFECTO DE TIEMPO AGOTADO ===== */
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:40;
+  background:rgba(255,0,28,0);
+  opacity:0;
+}
+.hero.timer-expired-flash::after{
+  animation:expiredRedFlash 1.25s ease-in-out both;
+}
+@keyframes expiredRedFlash{
+  0%{opacity:0;background:rgba(255,0,28,0)}
+  18%{opacity:1;background:rgba(255,0,28,.34)}
+  36%{opacity:.25;background:rgba(255,0,28,.12)}
+  55%{opacity:1;background:rgba(255,0,28,.48)}
+  76%{opacity:.55;background:rgba(255,0,28,.28)}
+  100%{opacity:0;background:rgba(255,0,28,0)}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .timerClock.running,.timerClock.warning,.timerClock.danger,.timerClock.critical,.timerClock.finished,
+  .hero.timer-edge-warning,.hero.timer-edge-danger,.hero.timer-edge-critical,.hero.timer-edge-zero{
+    animation:none!important;
+  }
+  .hero.timer-edge-warning{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 5px rgba(255,55,72,.48)}
+  .hero.timer-edge-danger{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 8px rgba(255,29,51,.72)}
+  .hero.timer-edge-critical,.hero.timer-edge-zero{box-shadow:0 24px 70px rgba(9,20,52,.28),inset 0 0 0 12px rgba(255,15,40,.92)}
+}
+
+@media(max-width:980px){
+  .top{flex-wrap:wrap}
+  .titleBlock{order:3;width:100%;max-width:none}
+  .game{grid-template-columns:1fr}
+  .wheelWrap{width:min(90vw,560px)}
+}
+@media(max-width:680px){
+  .app{padding:8px}
+  .hero{padding:14px;border-radius:22px}
+  .sideWords{display:none}
+  .esiLogo{font-size:38px}
+  .modeButtons{grid-template-columns:1fr}
+  .deckGrid{grid-template-columns:repeat(2,1fr)}
+  .footerStrip{grid-template-columns:1fr}
+  .allCards{grid-template-columns:1fr}
+  .hubButton{width:122px;height:122px}
+  .hubButton strong{font-size:30px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="hero">
+    <span class="paint a"></span><span class="paint b"></span><span class="paint c"></span><span class="paint d"></span>
+
+    <header class="top">
+      <div class="esiLogo" aria-label="Educación Sexual Integral">
+        <span class="r">Educación</span>
+        <span class="g">Sexual</span>
+        <span class="p">Integral</span>
+      </div>
+
+      <div class="titleBlock">
+        <div class="titleTape">Ciudadanía digital y sexualidad</div><br>
+        <div class="subtitleTape">Mitos, verdades y decisiones en Internet</div>
+      </div>
+
+      <div class="sideWords">
+        <span>CUIDADO</span><span>DIVERSIDAD</span><span>DERECHOS</span>
+        <span>RESPETO</span><span>CONSENTIMIENTO</span><span>LIBERTAD</span>
+      </div>
+    </header>
+
+    <section class="game">
+      <div class="wheelSide">
+        <div class="chalkNote">Pensá antes de compartir · Tu privacidad vale</div>
+
+        <div class="wheelWrap">
+          <div class="pointer"></div>
+          <canvas id="wheel" width="900" height="900"></canvas>
+          <button class="hubButton" id="hubButton" aria-label="Tocar para girar">
+            <strong>TOCÁ</strong>
+            <small>para girar</small>
+          </button>
+        </div>
+
+        <div class="chalkBanner">Girá, pensá, debatí y aprendé</div>
+
+        <div class="miniControls">
+          <button class="softBtn" id="spinAlt">🎡 Girar</button>
+          <button class="softBtn" id="resetBtn">↻ Reiniciar mazo</button>
+        </div>
+      </div>
+
+      <div class="playSide">
+        <section class="modePanel">
+          <h3>Modo de juego</h3>
+          <div class="modeButtons">
+            <button class="modeBtn" id="simpleBtn">Modo simple<small>Mito o Verdad</small></button>
+            <button class="modeBtn active" id="completeBtn">Modo completo<small>Todas las categorías</small></button>
+          </div>
+        </section>
+
+        <section class="cardPanel">
+          <div class="timerZone" aria-live="polite">
+            <div class="timerClock" id="timerClock" role="timer" aria-label="Cronómetro de respuesta">
+              <div class="timerIcon" id="timerIcon">⏱</div>
+              <div class="timerText">
+                <small id="timerLabel">Tiempo para responder</small>
+                <div class="timerDigits" id="timerDigits">02:00</div>
+              </div>
+            </div>
+          </div>
+          <div id="deckView">
+            <h2><span>Elegí una carta</span></h2>
+            <p class="cardLead" id="deckLead">Tocá el centro de la ruleta y después seleccioná 1 de las 8 cartas.</p>
+            <div class="deckGrid" id="deckGrid"></div>
+          </div>
+
+          <div id="chosenView" class="hidden">
+            <h2><span>Tu carta</span></h2>
+            <div class="bigCard">
+              <span class="bigBadge" id="bigBadge">Categoría</span>
+              <div class="bigQuestion" id="bigQuestion"></div>
+              <div class="bigSub" id="bigSub"></div>
+
+              <div class="actionRow">
+                <button class="actionBtn reveal" id="revealBtn">👁 Revelar</button>
+                <button class="actionBtn suggest" id="suggestBtn">💡 Sugerir respuesta</button>
+                <button class="actionBtn debate" id="debateBtn">💬 Seguir pensando</button>
+                <button class="actionBtn back" id="backBtn">↩ Volver</button>
+              </div>
+
+              <div class="answerBox" id="answerBox">
+                <h3 id="answerTitle"></h3>
+                <div id="answerText"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats">
+            <span id="playedInfo">0 jugadas</span>
+            <div class="progress"><span id="progressFill"></span></div>
+            <span id="remainingInfo">60 sin ver</span>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="footerStrip">
+      <div class="infoCard">
+        <strong>💡 La ESI también se juega</strong>
+        <small>Conocer, preguntarnos, debatir y respetar también es parte de aprender.</small>
+      </div>
+      <button class="allBtn" id="allBtn">▦ Ver todas las cartas</button>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modalBox">
+    <div class="modalTop">
+      <h2>Las 60 cartas</h2>
+      <button class="closeBtn" id="closeModal">×</button>
+    </div>
+    <div class="allCards" id="allCards"></div>
+  </div>
+</div>
+
+<script>
+const fullCategories = [
+  {key:"myth",label:"MITO",color:"#ff334d"},
+  {key:"truth",label:"VERDAD",color:"#24cf68"},
+  {key:"debate",label:"DEBATIR",color:"#ff4fbd"},
+  {key:"action",label:"¿QUÉ HARÍAS?",color:"#1f9df0"},
+  {key:"five",label:"NOMBRÁ 5",color:"#ff941f"},
+  {key:"wild",label:"COMODÍN",color:"#8d49e8"}
+];
+const simpleCategories = fullCategories.slice(0,2);
+
+const cards = {
+myth:[
+{q:"Si borro una foto o mensaje que envié, desaparece para siempre de Internet.",a:"MITO",e:"Una vez compartido, puede haber sido guardado, capturado o reenviado.",d:"¿Qué podemos hacer antes de enviar algo que después podría circular?",s:"Ejemplo: diría que es un mito porque aunque yo lo borre, otra persona pudo hacer una captura o guardarlo."},
+{q:"Compartir fotos íntimas de otra persona sin su consentimiento no tiene consecuencias.",a:"MITO",e:"Difundir contenido íntimo sin consentimiento vulnera la privacidad y puede generar consecuencias personales, escolares y legales.",d:"¿Qué derecho de la otra persona se vulnera?",s:"Ejemplo: es mito porque sí tiene consecuencias y se vulneran la privacidad y el consentimiento."},
+{q:"Si alguien pide fotos íntimas de forma insistente, está bien acceder para no perder la relación.",a:"MITO",e:"Nadie tiene derecho a presionar a otra persona. Una decisión válida debe ser libre.",d:"¿Cuándo un pedido se transforma en presión?",s:"Ejemplo: es mito porque una relación sana no obliga ni presiona para enviar fotos."},
+{q:"Tener las cuentas en modo privado garantiza que nadie más verá el contenido.",a:"MITO",e:"La privacidad reduce la exposición, pero una captura o reenvío puede hacer circular ese contenido.",d:"¿Qué diferencia hay entre reducir un riesgo y eliminarlo?",s:"Ejemplo: el modo privado ayuda, pero no impide capturas o reenvíos."},
+{q:"Aceptar a alguien porque tiene muchos seguidores significa que su perfil es confiable.",a:"MITO",e:"La cantidad de seguidores no demuestra la identidad real ni las intenciones de una persona.",d:"¿Qué datos podrían ayudarnos a verificar mejor un perfil?",s:"Ejemplo: muchos seguidores no prueban quién es realmente una persona."},
+{q:"Si una foto desaparece después de verla, ya no puede guardarse.",a:"MITO",e:"Pueden existir capturas, grabaciones de pantalla u otros medios para conservarla.",d:"¿Por qué 'desaparecer' no significa necesariamente 'dejar de existir'?",s:"Ejemplo: siempre puede haber una captura o una grabación."},
+{q:"Si dos personas son pareja, una puede revisar el celular de la otra sin pedir permiso.",a:"MITO",e:"Estar en pareja no elimina el derecho a la privacidad ni justifica el control.",d:"¿Cómo se construye confianza sin controlar?",s:"Ejemplo: la pareja no anula la privacidad; revisar el celular sin permiso es una invasión."},
+{q:"Un mensaje incómodo en Internet no es importante porque sucede en una pantalla.",a:"MITO",e:"Las situaciones digitales pueden producir efectos reales y requieren cuidado y acompañamiento.",d:"¿Por qué algo virtual puede tener consecuencias reales?",s:"Ejemplo: un mensaje puede angustiar, presionar o dañar aunque sea online."},
+{q:"Si alguien comparte una imagen privada solo con amigos, deja de ser privada.",a:"MITO",e:"Compartir con un grupo limitado no convierte automáticamente el contenido en público ni autoriza a reenviarlo.",d:"¿Qué responsabilidad tiene quien recibe contenido privado?",s:"Ejemplo: sigue siendo privado y nadie tiene permiso automático para reenviarlo."},
+{q:"El grooming solo puede ocurrir si la persona adulta usa un nombre falso.",a:"MITO",e:"El engaño puede incluir una identidad falsa, pero no es el único elemento. Lo central es el acercamiento digital de una persona adulta a un/a menor con fines sexuales.",d:"¿Qué otras señales podrían ser de alerta?",s:"Ejemplo: puede haber grooming aunque la persona use su identidad real."}
+],
+truth:[
+{q:"Bloquear a alguien en redes sociales es una forma válida de poner un límite.",a:"VERDAD",e:"Bloquear, silenciar o restringir puede ser una forma de proteger la privacidad y establecer límites.",d:"¿Por qué poner un límite no es lo mismo que agredir?",s:"Ejemplo: bloquear puede ayudar a cuidarse y marcar un límite."},
+{q:"Todo lo que se sube a Internet puede quedar disponible aunque después se borre.",a:"VERDAD",e:"Puede haber sido descargado, copiado, capturado o reenviado.",d:"¿Cómo cambia esto la forma en que pensamos antes de publicar?",s:"Ejemplo: otra persona pudo guardarlo antes de que lo borremos."},
+{q:"Se puede pedir ayuda a una persona adulta de confianza si algo en Internet genera incomodidad.",a:"VERDAD",e:"Pedir ayuda es una medida de cuidado y no es necesario enfrentar estas situaciones en soledad.",d:"¿A quiénes podríamos recurrir?",s:"Ejemplo: pedir ayuda es una forma de cuidarse y no quedarse solo."},
+{q:"Cualquier persona puede fingir una identidad distinta en una red social.",a:"VERDAD",e:"Fotos, nombres y datos pueden ser falsos o manipulados.",d:"¿Qué información no demuestra por sí sola quién está detrás de un perfil?",s:"Ejemplo: un perfil puede usar fotos y datos falsos."},
+{q:"Si una persona desconocida se muestra muy cariñosa o insistente rápidamente, puede ser una señal de alerta.",a:"VERDAD",e:"La confianza acelerada, la insistencia y los pedidos de secreto o datos personales pueden ser señales para actuar con precaución.",d:"¿Qué diferencia hay entre confianza y confianza forzada?",s:"Ejemplo: esa insistencia puede buscar generar confianza demasiado rápido."},
+{q:"El consentimiento puede cambiar en cualquier momento.",a:"VERDAD",e:"Una persona puede aceptar algo y luego cambiar de opinión. Ese cambio debe ser respetado.",d:"¿Qué significa respetar un límite que aparece después?",s:"Ejemplo: decir que sí una vez no obliga a seguir aceptando después."},
+{q:"No reenviar contenido íntimo recibido sin permiso es una forma de cuidado.",a:"VERDAD",e:"Cortar la circulación evita ampliar el daño y respeta la privacidad.",d:"¿Por qué no reenviar también es una acción?",s:"Ejemplo: no reenviar protege a la persona y evita más daño."},
+{q:"Activar la verificación en dos pasos mejora la seguridad de una cuenta.",a:"VERDAD",e:"Agrega una barrera adicional frente al acceso no autorizado.",d:"¿Qué otras medidas de seguridad conocen?",s:"Ejemplo: suma un segundo control para entrar a la cuenta."},
+{q:"Una contraseña larga y única suele ser más segura que una corta y repetida.",a:"VERDAD",e:"Usar claves distintas y difíciles de adivinar reduce el riesgo de acceso indebido.",d:"¿Por qué repetir la misma contraseña puede ser peligroso?",s:"Ejemplo: si una clave se filtra, repetirla expone varias cuentas."},
+{q:"La privacidad también forma parte del cuidado en los vínculos digitales.",a:"VERDAD",e:"Respetar límites, permisos e información personal es parte de un vínculo saludable.",d:"¿Qué acciones muestran respeto por la privacidad?",s:"Ejemplo: pedir permiso antes de publicar algo de otra persona."}
+],
+debate:[
+{q:"Un compañero reenvía una captura de una conversación privada porque le parece graciosa.",e:"Conversen sobre privacidad, confianza y consentimiento.",d:"¿Qué debería hacer el grupo cuando recibe algo privado?",s:"Ejemplo: no reenviar, pedir que la borren y pensar cómo cuidar a la persona afectada."},
+{q:"Una persona pide la contraseña de su pareja como 'prueba de amor'.",e:"Analicen confianza, control, autonomía y límites.",d:"¿Qué otras formas existen de construir confianza?",s:"Ejemplo: la confianza se construye hablando y respetando, no controlando."},
+{q:"En un grupo escolar se comparte una foto vergonzosa y casi todos reaccionan con emojis.",e:"Comentar o reenviar también puede ampliar el daño.",d:"¿Qué acciones podrían cortar la circulación?",s:"Ejemplo: no reaccionar, pedir que la borren y apoyar a quien fue expuesto."},
+{q:"Una cuenta desconocida pregunta por horarios, escuela, familia y dónde vive una persona.",e:"Piensen qué datos cotidianos pueden volverse sensibles.",d:"¿Qué información personal evitarían compartir?",s:"Ejemplo: evitaría dirección, horarios, escuela y datos familiares."},
+{q:"Dos amigos discuten porque uno subió una foto del otro sin preguntarle.",e:"Analicen permiso, confianza y derecho a decidir sobre la propia imagen.",d:"¿Ser amigos cambia la necesidad de pedir permiso?",s:"Ejemplo: aunque sean amigos, igual hay que pedir permiso."},
+{q:"Alguien borra a su pareja de redes cada vez que se enoja y luego exige explicaciones.",e:"Debatan sobre vínculos, presión, control y formas de resolver conflictos.",d:"¿Qué alternativas serían más saludables?",s:"Ejemplo: hablar del conflicto en lugar de usar las redes para manipular."},
+{q:"Una persona recibe bromas constantes sobre su cuerpo en comentarios de redes.",e:"Reflexionen sobre impacto, límites y responsabilidad colectiva.",d:"¿Cuándo una 'broma' deja de serlo?",s:"Ejemplo: cuando lastima, humilla o la otra persona muestra incomodidad."},
+{q:"Un grupo crea una cuenta anónima para publicar rumores sobre compañeros.",e:"Analicen anonimato, responsabilidad y consecuencias.",d:"¿El anonimato elimina la responsabilidad?",s:"Ejemplo: no; aunque sea anónimo, puede causar daño."},
+{q:"Alguien publica la ubicación de un amigo sin avisarle.",e:"Piensen en privacidad, seguridad y consentimiento.",d:"¿Qué riesgos puede generar compartir ubicaciones ajenas?",s:"Ejemplo: puede exponer a la persona y vulnerar su privacidad."},
+{q:"Una persona recibe mensajes cariñosos de alguien que conoció en un juego online y le pide pasar a un chat privado.",e:"Debatan sobre señales, confianza y precaución.",d:"¿Qué preguntas se harían antes de continuar?",s:"Ejemplo: conviene desconfiar, no dar datos y hablar con alguien de confianza."}
+],
+action:[
+{q:"Recibís una imagen íntima de otra persona en un grupo. ¿Qué harías?",e:"No reenviarla, cortar la circulación y buscar acompañamiento si hace falta.",d:"¿Por qué no reenviar también es una decisión activa?",s:"Ejemplo: no la reenviaría, pediría que la borren y trataría de cuidar a la persona afectada."},
+{q:"Una persona insiste en que le mandes una foto que no querés enviar. ¿Qué harías?",e:"Podés decir que no, cortar la conversación, bloquear y pedir ayuda.",d:"¿Qué frases servirían para poner un límite claro?",s:"Ejemplo: 'No quiero enviar eso. Te pido que no insistas'."},
+{q:"Descubrís que alguien creó un perfil falso usando fotos de un compañero. ¿Qué harías?",e:"Evitar amplificarlo, conservar información útil, reportar y acompañar.",d:"¿Por qué acompañar también es importante?",s:"Ejemplo: guardaría evidencia, reportaría la cuenta y avisaría al compañero."},
+{q:"Una cuenta desconocida te pide tu número de teléfono después de hablar solo unos minutos. ¿Qué harías?",e:"Conviene frenar, no compartir datos y evaluar con cuidado.",d:"¿Qué información puede parecer pequeña pero revelar mucho?",s:"Ejemplo: no daría mi número y seguiría con mucha precaución."},
+{q:"Un amigo te pide que guardes secreto sobre una situación online que lo asusta. ¿Qué harías?",e:"Escuchar, acompañar y buscar ayuda si hay riesgo o miedo.",d:"¿Todos los secretos deben guardarse?",s:"Ejemplo: lo escucharía, pero si hay riesgo pediría ayuda a un adulto de confianza."},
+{q:"Te etiquetan en una publicación que te incomoda. ¿Qué harías?",e:"Podés pedir que la retiren, quitar la etiqueta y ajustar privacidad.",d:"¿Qué derecho estás ejerciendo?",s:"Ejemplo: pediría que la saquen y quitaría la etiqueta."},
+{q:"Ves que un compañero está siendo insultado en comentarios. ¿Qué harías?",e:"No sumarse, apoyar, reportar si corresponde y pedir ayuda si escala.",d:"¿Qué significa ser espectador activo?",s:"Ejemplo: no participaría de los insultos y acompañaría al compañero."},
+{q:"Te llega un enlace extraño desde la cuenta de un amigo. ¿Qué harías?",e:"No abrirlo de inmediato y verificar por otro medio.",d:"¿Qué señales hacen sospechoso a un enlace?",s:"Ejemplo: preguntaría por otro medio si realmente me lo mandó."},
+{q:"Alguien amenaza con publicar una conversación privada si no hacés lo que pide. ¿Qué harías?",e:"No ceder, conservar evidencia y buscar ayuda.",d:"¿Por qué la amenaza cambia la situación?",s:"Ejemplo: guardaría pruebas y pediría ayuda rápidamente."},
+{q:"Una persona con la que chateás te pide que no cuentes a nadie sobre la conversación. ¿Qué harías?",e:"Los pedidos de secreto pueden ser una señal de alerta.",d:"¿Qué diferencia hay entre privacidad y secreto impuesto?",s:"Ejemplo: lo tomaría como una alerta y lo hablaría con alguien de confianza."}
+],
+five:[
+{q:"Mencionen 5 señales de alerta en una conversación con una persona desconocida.",e:"Insistencia, secretos, presión, preguntas personales y pedidos de imágenes.",d:"¿Todas tienen que aparecer juntas?",s:"Ejemplo: insistencia, secreto, preguntas íntimas, presión y exceso de confianza rápida."},
+{q:"Mencionen 5 acciones que ayudan a cuidar la privacidad en redes.",e:"Privacidad, contraseñas robustas, 2FA, pensar antes de publicar y evitar datos sensibles.",d:"¿Cuál reduce riesgos pero no los elimina?",s:"Ejemplo: contraseña segura, 2FA, revisar privacidad, no compartir datos y pensar antes de publicar."},
+{q:"Mencionen 5 personas o espacios a los que podrían acudir si una situación digital preocupa.",e:"Familia, adultos de confianza, docentes, preceptoría y equipos escolares.",d:"¿Qué características debería tener alguien de confianza?",s:"Ejemplo: familia, docente, preceptor/a, directivo/a y otro adulto de confianza."},
+{q:"Mencionen 5 datos personales que conviene pensar antes de publicar.",e:"Dirección, teléfono, ubicación, horarios y escuela.",d:"¿Cuál parece inocente pero podría revelar demasiado?",s:"Ejemplo: dirección, teléfono, ubicación, horarios y nombre de la escuela."},
+{q:"Mencionen 5 formas de poner límites en una conversación digital.",e:"Decir que no, no responder, silenciar, bloquear y pedir ayuda.",d:"¿Cuál usarían primero?",s:"Ejemplo: decir que no, no responder, silenciar, bloquear y pedir ayuda."},
+{q:"Mencionen 5 conductas que muestran respeto por otra persona en redes.",e:"Pedir permiso, no reenviar, respetar límites, evitar burlas y cuidar privacidad.",d:"¿Cuál suele olvidarse más?",s:"Ejemplo: pedir permiso, no reenviar, no burlarse, respetar límites y cuidar privacidad."},
+{q:"Mencionen 5 cosas que deberían hacerlos desconfiar de un perfil.",e:"Datos contradictorios, fotos dudosas, presión, secretos y preguntas íntimas.",d:"¿Una sola señal alcanza para tener cuidado?",s:"Ejemplo: fotos dudosas, datos raros, preguntas íntimas, apuro y secretos."},
+{q:"Mencionen 5 maneras de construir confianza sin pedir contraseñas.",e:"Dialogar, respetar tiempos, cumplir acuerdos, escuchar y no controlar.",d:"¿Por qué controlar no es lo mismo que confiar?",s:"Ejemplo: hablar, escuchar, respetar tiempos, cumplir acuerdos y no controlar."},
+{q:"Mencionen 5 decisiones de cuidado antes de subir una foto.",e:"Pedir permiso, revisar quién aparece, pensar el alcance, evitar datos y configurar audiencia.",d:"¿Cuál depende también de otras personas?",s:"Ejemplo: pedir permiso, revisar quién aparece, elegir audiencia, no mostrar datos y pensar antes de subir."},
+{q:"Mencionen 5 acciones útiles si una cuenta fue vulnerada.",e:"Cambiar contraseña, cerrar sesiones, activar 2FA, revisar datos y pedir ayuda.",d:"¿Cuál harían primero?",s:"Ejemplo: cambiar contraseña, cerrar sesiones, activar 2FA, revisar el mail y pedir ayuda."}
+],
+wild:[
+{q:"Elegí una afirmación anterior y convertíla en un consejo breve para alguien de tu edad.",e:"Busquen un mensaje claro, respetuoso y útil.",d:"¿Cómo hacer que un consejo sea fácil de recordar?",s:"Ejemplo: 'Antes de publicar, pensá si te sentirías cómodo si eso sigue circulando'."},
+{q:"Inventen una situación de ciudadanía digital para que el próximo grupo decida si es mito o verdad.",e:"La situación debe permitir argumentar.",d:"¿Qué información tendría que tener quien coordina?",s:"Ejemplo: 'Si una persona te pide secreto sobre sus mensajes, eso siempre es normal'."},
+{q:"Elijan: DEBATIR, NOMBRÁ 5 o ¿QUÉ HARÍAS?",e:"Elijan la modalidad que menos hayan trabajado.",d:"¿Cuál les obliga a pensar más?",s:"Ejemplo: elegir '¿Qué harías?' y explicar una situación concreta."},
+{q:"En 20 segundos, inventen un lema de cuidado digital.",e:"Debe ser corto, claro y recordable.",d:"¿Qué palabra no debería faltar?",s:"Ejemplo: 'En redes también cuidamos los límites'."},
+{q:"Transformen una señal de alerta en una regla de cuidado.",e:"Pasen del problema a una acción concreta.",d:"¿Qué cambia cuando pasamos del problema a la acción?",s:"Ejemplo: 'Si me presionan para enviar algo, freno y pido ayuda'."},
+{q:"Representen sin hablar una situación de presión digital para que otro equipo la adivine.",e:"La dramatización debe cuidar a quienes participan.",d:"¿Qué elementos hicieron reconocible la situación?",s:"Ejemplo: representar insistencia y un límite claro sin usar experiencias personales."},
+{q:"Inventen una respuesta breve para rechazar un pedido que los incomoda.",e:"Debe ser clara, respetuosa y firme.",d:"¿Por qué no hace falta justificar demasiado un límite?",s:"Ejemplo: 'No quiero hacer eso. Te pido que no insistas'."},
+{q:"Creen un emoji o símbolo imaginario para indicar 'esto es una señal de alerta'.",e:"Describan qué significa y cuándo lo usarían.",d:"¿Qué situaciones representarían?",s:"Ejemplo: un candado rojo con signo de exclamación."},
+{q:"Elijan una palabra: PRIVACIDAD, RESPETO, CONFIANZA o LÍMITE. Explíquenla con un ejemplo digital.",e:"Busquen un ejemplo cotidiano.",d:"¿Qué otras palabras sumarían?",s:"Ejemplo: 'Límite: bloqueo a alguien que insiste y me incomoda'."},
+{q:"Cambien el final de una situación riesgosa para convertirla en una situación de cuidado.",e:"Piensen qué decisión o pedido de ayuda modifica el desenlace.",d:"¿Cuál fue el punto de cambio?",s:"Ejemplo: 'En vez de seguir respondiendo, corta la conversación y pide ayuda'."}
+]
+};
+
+let mode="complete";
+let categories=[...fullCategories];
+let currentCategory=null;
+let currentEight=[];
+let currentCard=null;
+let rotation=0;
+let spinning=false;
+let played=0;
+let seen=new Set();
+
+/* Cronómetro: inicia cuando la carta termina de girar. */
+const TIMER_TOTAL_SECONDS=120;
+let timerRemaining=TIMER_TOTAL_SECONDS;
+let timerInterval=null;
+let timerStartedAt=null;
+let timerExpiredHandled=false;
+
+/* Sonido de latido sintetizado con Web Audio: no requiere archivos externos. */
+let audioCtx=null;
+let nextHeartbeatAt=0;
+
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+const hubButton=document.getElementById("hubButton");
+const spinAlt=document.getElementById("spinAlt");
+const resetBtn=document.getElementById("resetBtn");
+const simpleBtn=document.getElementById("simpleBtn");
+const completeBtn=document.getElementById("completeBtn");
+const deckGrid=document.getElementById("deckGrid");
+const deckLead=document.getElementById("deckLead");
+const deckView=document.getElementById("deckView");
+const chosenView=document.getElementById("chosenView");
+const bigBadge=document.getElementById("bigBadge");
+const bigQuestion=document.getElementById("bigQuestion");
+const bigSub=document.getElementById("bigSub");
+const revealBtn=document.getElementById("revealBtn");
+const suggestBtn=document.getElementById("suggestBtn");
+const debateBtn=document.getElementById("debateBtn");
+const backBtn=document.getElementById("backBtn");
+const answerBox=document.getElementById("answerBox");
+const answerTitle=document.getElementById("answerTitle");
+const answerText=document.getElementById("answerText");
+const playedInfo=document.getElementById("playedInfo");
+const remainingInfo=document.getElementById("remainingInfo");
+const progressFill=document.getElementById("progressFill");
+const allBtn=document.getElementById("allBtn");
+const modal=document.getElementById("modal");
+const closeModal=document.getElementById("closeModal");
+const allCards=document.getElementById("allCards");
+const hero=document.querySelector(".hero");
+const timerClock=document.getElementById("timerClock");
+const timerDigits=document.getElementById("timerDigits");
+const timerLabel=document.getElementById("timerLabel");
+const timerIcon=document.getElementById("timerIcon");
+
+function totalCards(){
+  return categories.reduce((s,c)=>s+cards[c.key].length,0);
+}
+function drawWheel(){
+  const c=canvas.width/2,r=canvas.width/2-24;
+  const arc=Math.PI*2/categories.length;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();ctx.translate(c,c);ctx.rotate(rotation);
+
+  categories.forEach((cat,i)=>{
+    const start=i*arc-Math.PI/2-arc/2,end=start+arc;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,start,end);ctx.closePath();
+    ctx.fillStyle=cat.color;ctx.fill();
+    ctx.strokeStyle="#fff";ctx.lineWidth=8;ctx.stroke();
+
+    ctx.save();
+    ctx.rotate(start+arc/2);
+    ctx.translate(r*.63,0);
+    ctx.rotate(Math.PI/2);
+    ctx.fillStyle="#fff";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.shadowColor="rgba(0,0,0,.25)";
+    ctx.shadowBlur=7;
+    ctx.font=categories.length>2?"1000 27px system-ui":"1000 44px system-ui";
+    let label=cat.label.split(" ");
+    if(label.length>1){
+      ctx.fillText(label[0],0,-15);
+      ctx.fillText(label.slice(1).join(" "),0,17);
+    }else ctx.fillText(cat.label,0,2);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(c,c,r,0,Math.PI*2);
+  ctx.strokeStyle="#e9edf3";
+  ctx.lineWidth=18;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(c,c,r-15,0,Math.PI*2);
+  ctx.strokeStyle="#aeb8c6";
+  ctx.lineWidth=5;
+  ctx.stroke();
+}
+function normalize(a){const t=Math.PI*2;return((a%t)+t)%t}
+function ease(t){return 1-Math.pow(1-t,3)}
+function selectedIndex(){
+  const arc=Math.PI*2/categories.length;
+  let best=0,dist=999;
+  categories.forEach((_,i)=>{
+    const center=i*arc-Math.PI/2+rotation;
+    const d=Math.abs(Math.atan2(Math.sin(center+Math.PI/2),Math.cos(center+Math.PI/2)));
+    if(d<dist){dist=d;best=i}
+  });
+  return best;
+}
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]]
+  }
+  return a;
+}
+
+
+function ensureAudio(){
+  try{
+    if(!audioCtx){
+      const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContextClass)return;
+      audioCtx=new AudioContextClass();
+    }
+    if(audioCtx.state==="suspended")audioCtx.resume();
+  }catch(_err){}
+}
+function heartbeatIntervalMs(){
+  if(timerRemaining<=5)return 280;
+  if(timerRemaining<=15)return 430;
+  if(timerRemaining<=30)return 620;
+  return 900;
+}
+function playHeartPulse(offset=0,volume=.22){
+  if(!audioCtx || audioCtx.state!=="running")return;
+  const now=audioCtx.currentTime+offset;
+
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  const filter=audioCtx.createBiquadFilter();
+
+  osc.type="sine";
+  osc.frequency.setValueAtTime(78,now);
+  osc.frequency.exponentialRampToValueAtTime(46,now+.115);
+
+  filter.type="lowpass";
+  filter.frequency.setValueAtTime(170,now);
+  filter.Q.setValueAtTime(.7,now);
+
+  gain.gain.setValueAtTime(.0001,now);
+  gain.gain.exponentialRampToValueAtTime(volume,now+.012);
+  gain.gain.exponentialRampToValueAtTime(.0001,now+.14);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(now);
+  osc.stop(now+.16);
+}
+function playHeartbeat(){
+  /* doble golpe: "lub-dub" */
+  playHeartPulse(0,.24);
+  playHeartPulse(.135,.15);
+}
+function scheduleHeartbeat(nowMs){
+  if(timerRemaining<=0)return;
+  if(nowMs>=nextHeartbeatAt){
+    playHeartbeat();
+    nextHeartbeatAt=nowMs+heartbeatIntervalMs();
+  }
+}
+function returnToCardsAfterTimeout(){
+  chosenView.classList.add("hidden");
+  deckView.classList.remove("hidden");
+  document.querySelectorAll(".cardPick").forEach(x=>x.style.pointerEvents="auto");
+  stopTimer({hide:true,reset:true});
+}
+function handleTimerExpired(){
+  if(timerExpiredHandled)return;
+  timerExpiredHandled=true;
+
+  /* Golpe final más marcado. */
+  playHeartPulse(0,.32);
+  playHeartPulse(.16,.20);
+
+  hero.classList.remove("timer-expired-flash");
+  void hero.offsetWidth;
+  hero.classList.add("timer-expired-flash");
+
+  setTimeout(()=>{
+    hero.classList.remove("timer-expired-flash");
+    returnToCardsAfterTimeout();
+  },1300);
+}
+
+function formatTimer(seconds){
+  const safe=Math.max(0,Math.ceil(seconds));
+  const m=Math.floor(safe/60);
+  const s=safe%60;
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+function clearTimerEdge(){
+  hero.classList.remove(
+    "timer-edge-warning",
+    "timer-edge-danger",
+    "timer-edge-critical",
+    "timer-edge-zero"
+  );
+}
+function updateTimerVisual(){
+  timerDigits.textContent=formatTimer(timerRemaining);
+  timerClock.classList.remove("warning","danger","critical","finished");
+  clearTimerEdge();
+
+  if(timerRemaining<=0){
+    timerClock.classList.remove("running");
+    timerClock.classList.add("finished");
+    timerDigits.textContent="00:00";
+    timerLabel.textContent="¡TIEMPO!";
+    timerIcon.textContent="⏰";
+    hero.classList.add("timer-edge-zero");
+    return;
+  }
+
+  timerClock.classList.add("running");
+  timerLabel.textContent="Tiempo para responder";
+  timerIcon.textContent="⏱";
+
+  /* 30 s: comienza el borde rojo; 15 s y 5 s aceleran el pulso. */
+  if(timerRemaining<=5){
+    timerClock.classList.add("critical");
+    hero.classList.add("timer-edge-critical");
+  }else if(timerRemaining<=15){
+    timerClock.classList.add("danger");
+    hero.classList.add("timer-edge-danger");
+  }else if(timerRemaining<=30){
+    timerClock.classList.add("warning");
+    hero.classList.add("timer-edge-warning");
+  }
+}
+function stopTimer({hide=false,reset=false}={}){
+  if(timerInterval){
+    clearInterval(timerInterval);
+    timerInterval=null;
+  }
+  timerStartedAt=null;
+  nextHeartbeatAt=0;
+  clearTimerEdge();
+  timerClock.classList.remove("running","warning","danger","critical","finished");
+  if(reset){
+    timerRemaining=TIMER_TOTAL_SECONDS;
+    timerDigits.textContent="02:00";
+    timerLabel.textContent="Tiempo para responder";
+    timerIcon.textContent="⏱";
+  }
+  if(hide)timerClock.classList.remove("show");
+}
+function startTimer(){
+  stopTimer({hide:false,reset:true});
+  ensureAudio();
+  timerExpiredHandled=false;
+  timerClock.classList.add("show","running");
+  timerRemaining=TIMER_TOTAL_SECONDS;
+  timerStartedAt=Date.now();
+  nextHeartbeatAt=timerStartedAt;
+  updateTimerVisual();
+
+  timerInterval=setInterval(()=>{
+    const nowMs=Date.now();
+    const elapsed=(nowMs-timerStartedAt)/1000;
+    timerRemaining=Math.max(0,TIMER_TOTAL_SECONDS-elapsed);
+    updateTimerVisual();
+    scheduleHeartbeat(nowMs);
+
+    if(timerRemaining<=0){
+      if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval=null;
+      }
+      handleTimerExpired();
+    }
+  },80);
+}
+
+function buildDeck(category){
+  currentCategory=category;
+  const pool=cards[category.key].map((c,i)=>({...c,_id:`${category.key}-${i}`}));
+  const unseen=pool.filter(c=>!seen.has(c._id));
+  const source=unseen.length>=8?unseen:pool;
+  currentEight=shuffle(source).slice(0,8);
+
+  deckView.classList.remove("hidden");
+  chosenView.classList.add("hidden");
+  deckLead.textContent=`Salió ${category.label}. Elegí una de las 8 cartas.`;
+  deckGrid.innerHTML="";
+
+  currentEight.forEach((card,idx)=>{
+    const el=document.createElement("div");
+    el.className="cardPick";
+    el.innerHTML=`
+      <div class="cardFace cardBack"></div>
+      <div class="cardFace cardFront">
+        <span class="frontBadge" style="background:${category.color}">${category.label}</span>
+        <div class="frontText">${card.q}</div>
+        <div class="frontHint">Carta ${idx+1}</div>
+      </div>`;
+    el.addEventListener("click",()=>{
+      if(el.classList.contains("flipped"))return;
+      ensureAudio();
+      document.querySelectorAll(".cardPick").forEach(x=>x.style.pointerEvents="none");
+      el.classList.add("flipped");
+      setTimeout(()=>openCard(card),620);
+    });
+    deckGrid.appendChild(el);
+  });
+}
+function openCard(card){
+  currentCard=card;
+  seen.add(card._id);
+  played++;
+  updateStats();
+
+  deckView.classList.add("hidden");
+  chosenView.classList.remove("hidden");
+
+  bigBadge.textContent=currentCategory.label;
+  bigBadge.style.background=currentCategory.color;
+  bigQuestion.textContent=card.q;
+  bigSub.textContent=(currentCategory.key==="myth"||currentCategory.key==="truth")
+    ?"Decidan en grupo y argumenten antes de revelar la respuesta."
+    :"Conversen, acuerden una respuesta y expliquen por qué.";
+
+  answerBox.className="answerBox";
+  answerTitle.textContent="";
+  answerText.textContent="";
+
+  /* La cuenta regresiva comienza justo al terminar el giro de la carta. */
+  startTimer();
+}
+function updateStats(){
+  playedInfo.textContent=`${played} jugada${played===1?"":"s"}`;
+  remainingInfo.textContent=`${Math.max(0,totalCards()-seen.size)} sin ver`;
+  progressFill.style.width=`${totalCards()?Math.min(100,seen.size/totalCards()*100):0}%`;
+}
+function reveal(){
+  if(!currentCard)return;
+  if(currentCard.a){
+    answerBox.className=`answerBox show ${currentCard.a==="MITO"?"mito":"verdad"}`;
+    answerTitle.textContent=currentCard.a==="MITO"?"✕ MITO":"✓ VERDAD";
+    answerText.textContent=currentCard.e;
+  }else{
+    answerBox.className="answerBox show guide";
+    answerTitle.textContent="Orientación";
+    answerText.textContent=currentCard.e;
+  }
+}
+function suggest(){
+  if(!currentCard)return;
+  answerBox.className="answerBox show suggested";
+  answerTitle.textContent="💡 Sugerencia de respuesta";
+  answerText.textContent=currentCard.s;
+}
+function debate(){
+  if(!currentCard)return;
+  answerBox.className="answerBox show guide";
+  answerTitle.textContent="💬 Para seguir pensando";
+  answerText.textContent=currentCard.d;
+}
+function spin(){
+  if(spinning)return;
+  stopTimer({hide:true,reset:true});
+  spinning=true;
+  hubButton.disabled=true;
+  spinAlt.disabled=true;
+  hubButton.classList.add("spinning");
+  hubButton.querySelector("strong").textContent="GIRA";
+  hubButton.querySelector("small").textContent="esperá...";
+
+  const start=rotation;
+  const target=start+(5+Math.random()*3)*Math.PI*2+Math.random()*Math.PI*2;
+  const duration=3600,t0=performance.now();
+
+  function frame(now){
+    const p=Math.min((now-t0)/duration,1);
+    rotation=start+(target-start)*ease(p);
+    drawWheel();
+    if(p<1)requestAnimationFrame(frame);
+    else{
+      rotation=normalize(rotation);
+      drawWheel();
+      const cat=categories[selectedIndex()];
+      buildDeck(cat);
+      spinning=false;
+      hubButton.disabled=false;
+      spinAlt.disabled=false;
+      hubButton.classList.remove("spinning");
+      hubButton.querySelector("strong").textContent="TOCÁ";
+      hubButton.querySelector("small").textContent="para girar";
+    }
+  }
+  requestAnimationFrame(frame);
+}
+function setMode(m){
+  stopTimer({hide:true,reset:true});
+  mode=m;
+  categories=m==="simple"?[...simpleCategories]:[...fullCategories];
+  simpleBtn.classList.toggle("active",m==="simple");
+  completeBtn.classList.toggle("active",m==="complete");
+  rotation=0;
+  currentCategory=null;
+  currentEight=[];
+  currentCard=null;
+  played=0;
+  seen=new Set();
+  deckGrid.innerHTML="";
+  deckLead.textContent="Tocá el centro de la ruleta y después seleccioná 1 de las 8 cartas.";
+  deckView.classList.remove("hidden");
+  chosenView.classList.add("hidden");
+  drawWheel();
+  updateStats();
+}
+function resetGame(){
+  stopTimer({hide:true,reset:true});
+  played=0;
+  seen=new Set();
+  currentCard=null;
+  deckGrid.innerHTML="";
+  deckLead.textContent="Mazo reiniciado. Tocá el centro de la ruleta para comenzar.";
+  deckView.classList.remove("hidden");
+  chosenView.classList.add("hidden");
+  updateStats();
+}
+function renderAllCards(){
+  allCards.innerHTML="";
+  fullCategories.forEach(cat=>{
+    cards[cat.key].forEach(card=>{
+      const item=document.createElement("div");
+      item.className="allCard";
+      item.innerHTML=`<b style="background:${cat.color}">${cat.label}</b><p>${card.q}</p>`;
+      allCards.appendChild(item);
+    });
+  });
+}
+hubButton.addEventListener("click",()=>{ensureAudio();spin();});
+spinAlt.addEventListener("click",()=>{ensureAudio();spin();});
+simpleBtn.addEventListener("click",()=>setMode("simple"));
+completeBtn.addEventListener("click",()=>setMode("complete"));
+resetBtn.addEventListener("click",resetGame);
+revealBtn.addEventListener("click",reveal);
+suggestBtn.addEventListener("click",suggest);
+debateBtn.addEventListener("click",debate);
+backBtn.addEventListener("click",()=>{
+  hero.classList.remove("timer-expired-flash");
+  stopTimer({hide:true,reset:true});
+  chosenView.classList.add("hidden");
+  deckView.classList.remove("hidden");
+  document.querySelectorAll(".cardPick").forEach(x=>x.style.pointerEvents="auto");
+});
+allBtn.addEventListener("click",()=>{
+  renderAllCards();
+  modal.classList.add("show");
+});
+closeModal.addEventListener("click",()=>modal.classList.remove("show"));
+modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")modal.classList.remove("show")});
+
+setMode("complete");
+</script>
+</body>
+</html>
